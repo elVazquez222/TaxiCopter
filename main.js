@@ -1,8 +1,10 @@
 window.addEventListener('load', () => {
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
-  canvas.width = 1500;
-  canvas.height = 1500;
+  // canvas.width = 1500;
+  // canvas.height = 1500;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - window.innerHeight * .1;
   const gravity = -.00981;
 
   class InputHandler {
@@ -34,16 +36,18 @@ window.addEventListener('load', () => {
     constructor(game) {
       this.game = game;
       this.width = 120;
-      this.height = 190;
+      this.height = 60;
       this.x = 20;
-      this.y = 100;
+      this.y = canvas.height - this.height;
       this.speedY = 0;
       this.speedX = 0;
     }
     update() {
+
       this.speedY -= gravity;
       this.y += this.speedY;
       this.x += this.speedX
+      consoleLog(this.speedY, this.speedX, this.x, this.y)
     }
     draw(context) {
       context.fillRect(this.x, this.y, this.width, this.height)
@@ -66,7 +70,14 @@ window.addEventListener('load', () => {
 
   const game = new Game(canvas.width, canvas.height);
 
-  function animate() {
+  const consoleLog = (ySpeed, xSpeed, x, y) => {
+    document.getElementById('ySpeed').innerHTML = `y speed: ${ySpeed}`
+    document.getElementById('xSpeed').innerHTML = `y speed: ${xSpeed}`
+    document.getElementById('x').innerHTML = `y speed: ${x}`
+    document.getElementById('y').innerHTML = `y speed: ${y}`
+  }
+
+  const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     game.update();
     game.draw(ctx);
