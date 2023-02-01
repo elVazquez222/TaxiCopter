@@ -12,16 +12,20 @@ window.addEventListener('load', () => {
       this.game = game;
       window.addEventListener('keydown', event => {
         if (event.key === "ArrowUp") {
-          game.player.speedY -= 1;
+          game.taxiCopter.speedY -= 1;
         }
         if (event.key === "ArrowDown") {
-          game.player.speedY += 1;
+          game.taxiCopter.speedY += 1;
         }
         if (event.key === "ArrowLeft") {
-          game.player.speedX -= 1;
+          if (!game.taxiCopter.landed) {
+            game.taxiCopter.speedX -= 1;
+          }
         }
         if (event.key === "ArrowRight") {
-          game.player.speedX += 1;
+          if (!game.taxiCopter.landed) {
+            game.taxiCopter.speedX += 1;
+          }
         }
       })
     }
@@ -38,16 +42,23 @@ window.addEventListener('load', () => {
       this.width = 120;
       this.height = 60;
       this.x = 20;
-      this.y = canvas.height - this.height;
+      this.y = canvas.height - this.height - 10;
       this.speedY = 0;
       this.speedX = 0;
+      this.landed = true;
     }
     update() {
-
+      consoleLog(this.speedY, this.speedX, this.x, this.y)
+      this.landed = this.y + this.height - 1 >= canvas.height;
+      if (this.landed && this.speedY !== 0) {
+        this.speedY = 0;
+        this.speedX = 0;
+        this.y = canvas.height - this.height;
+        return;
+      }
       this.speedY -= gravity;
       this.y += this.speedY;
       this.x += this.speedX
-      consoleLog(this.speedY, this.speedX, this.x, this.y)
     }
     draw(context) {
       context.fillRect(this.x, this.y, this.width, this.height)
@@ -57,24 +68,26 @@ window.addEventListener('load', () => {
     constructor(width, height) {
       this.width = width;
       this.height = height;
-      this.player = new taxiCopterCopter(this);
+      this.taxiCopter = new taxiCopterCopter(this);
       this.input = new InputHandler(this);
     }
     update() {
-      this.player.update();
+      this.taxiCopter.update();
     }
     draw(context) {
-      this.player.draw(context);
+      this.taxiCopter.draw(context);
     }
   }
 
   const game = new Game(canvas.width, canvas.height);
 
-  const consoleLog = (ySpeed, xSpeed, x, y) => {
+  const consoleLog = (ySpeed, xSpeed, x, y, canvasHeight, taxiHeight) => {
     document.getElementById('ySpeed').innerHTML = `y speed: ${ySpeed}`
-    document.getElementById('xSpeed').innerHTML = `y speed: ${xSpeed}`
-    document.getElementById('x').innerHTML = `y speed: ${x}`
-    document.getElementById('y').innerHTML = `y speed: ${y}`
+    document.getElementById('xSpeed').innerHTML = `x speed: ${xSpeed}`
+    document.getElementById('x').innerHTML = `x: ${x}`
+    document.getElementById('y').innerHTML = `y: ${y}`
+    document.getElementById('y').innerHTML = `y: ${y}`
+    document.getElementById('bottomReached').innerHTML = `gelandet: ${y + taxiHeight >= canvasHeight}`
   }
 
   const animate = () => {
