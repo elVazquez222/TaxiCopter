@@ -34,17 +34,20 @@ window.addEventListener('load', () => {
 
   }
   class Destination {
-    constructor(game, id, width, height, x) {
+    constructor(game, id, width, height, x, y = null) {
       this.game = game;
       this.id = id;
       this.width = width;
       this.height = height;
       this.x = x;
-      this.y = window.innerHeight - this.height;
+      this.y = y ? y : window.innerHeight - this.height;
     }
     draw(context) {
+      const textSize = 50;
       ctx.fillStyle = "white";
-      context.strokeText('text', this.x, this.y)
+      context.fillRect(this.x, this.y - textSize, this.width, this.height);
+      context.strokeText(this.id, this.x + (this.width / 2) - 4, this.y);
+      ctx.font = `${textSize}px serif`;
     }
   }
   class taxiCopterCopter {
@@ -82,7 +85,7 @@ window.addEventListener('load', () => {
       this.height = height;
       this.taxiCopter = new taxiCopterCopter(this);
       this.destinations = destinations.map(destination => {
-        const desti = new Destination(this, destination.id, destination.width, destination.height, destination.x);
+        const desti = new Destination(this, destination.id, destination.width, destination.height, destination.x, destination.y);
         return desti;
       })
       this.input = new InputHandler(this);
@@ -98,11 +101,25 @@ window.addEventListener('load', () => {
 
   // todo: auslagern
   const destinations = [{
-    id: 1,
-    width: 200,
-    height: 300,
-    x: 500
-  }]
+      id: 1,
+      width: 200,
+      height: 300,
+      x: 500
+    },
+    {
+      id: 2,
+      width: 300,
+      height: 700,
+      x: 900
+    },
+    {
+      id: 3,
+      width: 400,
+      height: 100,
+      x: 100,
+      y: 400
+    },
+  ]
   const game = new Game(canvas.width, canvas.height, destinations);
 
   const consoleLog = (ySpeed, xSpeed, x, y, canvasHeight, taxiHeight) => {
