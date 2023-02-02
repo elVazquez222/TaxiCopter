@@ -34,7 +34,18 @@ window.addEventListener('load', () => {
 
   }
   class Destination {
-
+    constructor(game, id, width, height, x) {
+      this.game = game;
+      this.id = id;
+      this.width = width;
+      this.height = height;
+      this.x = x;
+      this.y = window.innerHeight - this.height;
+    }
+    draw(context) {
+      ctx.fillStyle = "white";
+      context.strokeText('text', this.x, this.y)
+    }
   }
   class taxiCopterCopter {
     constructor(game) {
@@ -61,14 +72,19 @@ window.addEventListener('load', () => {
       this.x += this.speedX
     }
     draw(context) {
-      context.fillRect(this.x, this.y, this.width, this.height)
+      ctx.fillStyle = "black";
+      context.fillRect(this.x, this.y, this.width, this.height);
     }
   }
   class Game {
-    constructor(width, height) {
+    constructor(width, height, destinations) {
       this.width = width;
       this.height = height;
       this.taxiCopter = new taxiCopterCopter(this);
+      this.destinations = destinations.map(destination => {
+        const desti = new Destination(this, destination.id, destination.width, destination.height, destination.x);
+        return desti;
+      })
       this.input = new InputHandler(this);
     }
     update() {
@@ -76,10 +92,18 @@ window.addEventListener('load', () => {
     }
     draw(context) {
       this.taxiCopter.draw(context);
+      this.destinations.forEach(destination => destination.draw(context));
     }
   }
 
-  const game = new Game(canvas.width, canvas.height);
+  // todo: auslagern
+  const destinations = [{
+    id: 1,
+    width: 200,
+    height: 300,
+    x: 500
+  }]
+  const game = new Game(canvas.width, canvas.height, destinations);
 
   const consoleLog = (ySpeed, xSpeed, x, y, canvasHeight, taxiHeight) => {
     document.getElementById('ySpeed').innerHTML = `y speed: ${ySpeed}`
