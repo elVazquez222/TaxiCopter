@@ -5,13 +5,24 @@ window.addEventListener('load', () => {
   // canvas.height = 1500;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - window.innerHeight * .1;
+  const taxiCopterWidth = 120;
+  const taxiCopterHeight = 60;
   const gravity = -.00981;
+  const landingAreas = [];
 
   class InputHandler {
     constructor(game) {
       this.game = game;
       window.addEventListener('keydown', event => {
         if (event.key === "ArrowUp") {
+          game.taxiCopter.landedOn = null;
+
+          if(game.taxiCopter.landedOn !== null || game.taxiCopter.speedY === 0) {
+            game.taxiCopter.starting = true;
+          } else {
+            game.taxiCopter.starting = false;
+          }
+
           game.taxiCopter.speedY -= 1;
         }
         if (event.key === "ArrowDown") {
@@ -40,7 +51,7 @@ window.addEventListener('load', () => {
       this.width = width;
       this.height = height;
       this.x = x;
-      this.y = y ? y : window.innerHeight - this.height;
+      this.y = y ?? window.innerHeight - this.height;
     }
     draw(context) {
       const textSize = 50;
@@ -48,29 +59,45 @@ window.addEventListener('load', () => {
       context.fillRect(this.x, this.y - textSize, this.width, this.height);
       context.strokeText(this.id, this.x + (this.width / 2) - 4, this.y);
       ctx.font = `${textSize}px serif`;
+      landingAreas.push({
+        xStart: this.x,
+        xEnd: this.x + this.width,
+        yStart: this.y
+      })
     }
   }
   class taxiCopterCopter {
     constructor(game) {
       this.game = game;
-      this.width = 120;
-      this.height = 60;
+      this.width = taxiCopterWidth;
+      this.height = taxiCopterHeight;
       this.x = 20;
       this.y = canvas.height - this.height - 10;
       this.speedY = 0;
       this.speedX = 0;
-      this.landed = true;
+      this.starting = false;
+      this.landedOn = {x: this.x, y: this.y}; // :{x:number, y:number}|null
     }
     update() {
-      consoleLog(this.speedY, this.speedX, this.x, this.y)
-      this.landed = this.y + this.height - 1 >= canvas.height;
-      if (this.landed && this.speedY !== 0) {
+      consoleLog(this.speedY, this.speedX, this.x, this.y);
+
+      // this.landedOn = checkLanding();
+      if(this.landedOn === null && this.y + this.height - 1 >= canvas.height && this.speedY > 0) {
+        this.landedOn = {x: this.x, y: this.y}
+      }
+      // this.landedOn = this.y + this.height - 1 >= canvas.height || this.y + taxiCopterHeight * 2 > landingAreas[0]?.yStart && this.x > landingAreas[0]?.xStart;
+      // this.landed = this.y + this.height - 1 >= canvas.height || checkLanding(this.x, this.y);
+
+      if (this.landedOn !== null && this.speedY !== 0) {
+        console.log(this.landedOn);
         this.speedY = 0;
         this.speedX = 0;
-        this.y = canvas.height - this.height;
+        this.y = this.landedOn.y;
+        this.x = this.landedOn.x;
         return;
       }
-      this.speedY -= gravity;
+
+      this.speedY -= !this.landedOn ? gravity : 0;
       this.y += this.speedY;
       this.x += this.speedX
     }
@@ -129,6 +156,20 @@ window.addEventListener('load', () => {
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('bottomReached').innerHTML = `gelandet: ${y + taxiHeight >= canvasHeight}`
+  }
+
+  const checkLanding = (x, y) => {
+    landed = false;
+
+    landingAreas.forEach(area => {
+      if (area.yStart > y) {
+        if (area.xStart < x && area.xEnd > x - 10) {
+          landed = true;
+        }
+      }
+    })
+
+    return landed;
   }
 
   const animate = () => {
