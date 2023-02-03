@@ -1,3 +1,5 @@
+import { debounce } from './helpers.js';
+
 window.addEventListener('load', () => {
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
@@ -62,7 +64,8 @@ window.addEventListener('load', () => {
       landingAreas.push({
         xStart: this.x,
         xEnd: this.x + this.width,
-        yStart: this.y
+        yStart: this.y,
+        yEnd: this.y + this.height
       })
     }
   }
@@ -72,7 +75,7 @@ window.addEventListener('load', () => {
       this.width = taxiCopterWidth;
       this.height = taxiCopterHeight;
       this.x = 20;
-      this.y = canvas.height - this.height - 10;
+      this.y = canvas.height - this.height - 1;
       this.speedY = 0;
       this.speedX = 0;
       this.starting = false;
@@ -81,12 +84,11 @@ window.addEventListener('load', () => {
     update() {
       consoleLog(this.speedY, this.speedX, this.x, this.y);
 
-      // this.landedOn = checkLanding();
-      if(this.landedOn === null && this.y + this.height - 1 >= canvas.height && this.speedY > 0) {
-        this.landedOn = {x: this.x, y: this.y}
-      }
-      // this.landedOn = this.y + this.height - 1 >= canvas.height || this.y + taxiCopterHeight * 2 > landingAreas[0]?.yStart && this.x > landingAreas[0]?.xStart;
-      // this.landed = this.y + this.height - 1 >= canvas.height || checkLanding(this.x, this.y);
+      checkLanding(this.x, this.y, this.speedY, this);
+      // if(this.landedOn === null && this.y + this.height - 1 >= canvas.height && this.speedY > 0) {
+      //   console.log('landing');
+      //   this.landedOn = {x: this.x, y:  landingAreas[0]?.yStart }
+      // }
 
       if (this.landedOn !== null && this.speedY !== 0) {
         console.log(this.landedOn);
@@ -156,20 +158,20 @@ window.addEventListener('load', () => {
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('bottomReached').innerHTML = `gelandet: ${y + taxiHeight >= canvasHeight}`
+    document.getElementById('landingAreas').innerHTML = `landingAreas: xStart: ${landingAreas[0]?.xStart} xEnd: ${landingAreas[0]?.xEnd} yStart: ${landingAreas[0]?.yStart} yEnd: ${landingAreas[0]?.yEnd}`
   }
 
-  const checkLanding = (x, y) => {
-    landed = false;
-
-    landingAreas.forEach(area => {
-      if (area.yStart > y) {
-        if (area.xStart < x && area.xEnd > x - 10) {
-          landed = true;
+  const checkLanding = (x, y, speedY, taxiCopter) => {
+    console.log(debounce(() => null));
+    debounce(landingAreas.forEach(area => {
+      if(
+          y + taxiCopterHeight - 1 >= area.yStart - taxiCopterHeight
+          && y + taxiCopterHeight - 1 < area.yEnd - taxiCopterHeight
+          && x > area.xStart && x < area.xEnd && speedY > 0
+        ) {
+          taxiCopter.landedOn = {x: taxiCopter.x, y: taxiCopter.y + 5 };
         }
-      }
-    })
-
-    return landed;
+    }))
   }
 
   const animate = () => {
