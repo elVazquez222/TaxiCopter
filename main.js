@@ -1,10 +1,9 @@
 import { debounce } from './helpers.js';
+import { destinations } from './destinations.js';
 
 window.addEventListener('load', () => {
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
-  // canvas.width = 1500;
-  // canvas.height = 1500;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - window.innerHeight * .1;
   const taxiCopterWidth = 120;
@@ -84,11 +83,7 @@ window.addEventListener('load', () => {
     update() {
       consoleLog(this.speedY, this.speedX, this.x, this.y);
 
-      checkLanding(this.x, this.y, this.speedY, this);
-      // if(this.landedOn === null && this.y + this.height - 1 >= canvas.height && this.speedY > 0) {
-      //   console.log('landing');
-      //   this.landedOn = {x: this.x, y:  landingAreas[0]?.yStart }
-      // }
+      this.speedY !== 0 && debounce(checkLanding(this));
 
       if (this.landedOn !== null && this.speedY !== 0) {
         console.log(this.landedOn);
@@ -128,27 +123,6 @@ window.addEventListener('load', () => {
     }
   }
 
-  // todo: auslagern
-  const destinations = [{
-      id: 1,
-      width: 200,
-      height: 300,
-      x: 500
-    },
-    {
-      id: 2,
-      width: 300,
-      height: 700,
-      x: 900
-    },
-    {
-      id: 3,
-      width: 400,
-      height: 100,
-      x: 100,
-      y: 400
-    },
-  ]
   const game = new Game(canvas.width, canvas.height, destinations);
 
   const consoleLog = (ySpeed, xSpeed, x, y, canvasHeight, taxiHeight) => {
@@ -158,24 +132,28 @@ window.addEventListener('load', () => {
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('bottomReached').innerHTML = `gelandet: ${y + taxiHeight >= canvasHeight}`
-    document.getElementById('landingAreas').innerHTML = `landingAreas: xStart: ${landingAreas[0]?.xStart} xEnd: ${landingAreas[0]?.xEnd} yStart: ${landingAreas[0]?.yStart} yEnd: ${landingAreas[0]?.yEnd}`
   }
 
-  const checkLanding = (x, y, speedY, taxiCopter) => {
-    console.log(debounce(() => null));
-    debounce(landingAreas.forEach(area => {
+  const checkLanding = (taxiCopter) => {
+
+    if(taxiCopter.y + taxiCopter.height - 1 >= canvas.height && taxiCopter.speedY > 0) {
+      taxiCopter.landedOn = {x: taxiCopter.x, y:  taxiCopter.y };
+      return;
+    };
+
+    landingAreas.forEach(area => {
       if(
-          y + taxiCopterHeight - 1 >= area.yStart - taxiCopterHeight
-          && y + taxiCopterHeight - 1 < area.yEnd - taxiCopterHeight
-          && x > area.xStart && x < area.xEnd && speedY > 0
+          taxiCopter.y + taxiCopterHeight - 1 >= area.yStart - taxiCopterHeight
+          && taxiCopter.y + taxiCopterHeight - 1 < area.yEnd - taxiCopterHeight
+          && taxiCopter.x > area.xStart && taxiCopter.x < area.xEnd && taxiCopter.speedY > 0
         ) {
           taxiCopter.landedOn = {x: taxiCopter.x, y: taxiCopter.y + 5 };
-        }
-    }))
+        };
+    });
   }
 
   const animate = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     game.update();
     game.draw(ctx);
     requestAnimationFrame(animate);
