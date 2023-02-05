@@ -90,7 +90,7 @@ window.addEventListener('load', () => {
       this.width = taxiCopterWidth;
       this.height = taxiCopterHeight;
       this.x = 20;
-      this.y = canvas.height - this.height - 1;
+      this.y = canvas.height - this.height - 5;
       this.speedY = 0;
       this.speedX = 0;
       this.starting = false;
@@ -166,16 +166,23 @@ window.addEventListener('load', () => {
 
   const checkLanding = (taxiCopter) => {
 
-    if(taxiCopter.y + taxiCopter.height - 1 >= canvas.height && taxiCopter.speedY > 0) {
+    if(taxiCopter.y -5 + taxiCopter.height >= canvas.height && taxiCopter.speedY > 0) {
       taxiCopter.landedOn = {x: taxiCopter.x, y:  taxiCopter.y };
       return;
     };
 
     landingAreas.forEach(area => {
+
+      const visualHoovesOffset = taxiCopter.speedX > 0
+        ? taxiCopter.width * .2
+        : taxiCopter.width * .8;
+        const taxiCopterHoovesPosition = taxiCopter.x + visualHoovesOffset;
+
       if(
-          taxiCopter.y + taxiCopterHeight - 1 >= area.yStart - taxiCopterHeight
-          && taxiCopter.y + taxiCopterHeight - 1 < area.yEnd - taxiCopterHeight
-          && taxiCopter.x > area.xStart && taxiCopter.x < area.xEnd && taxiCopter.speedY > 0
+          taxiCopter.y + taxiCopterHeight - 5 >= area.yStart - taxiCopterHeight
+          && taxiCopter.y + taxiCopterHeight - 5 < area.yEnd - taxiCopterHeight
+          && taxiCopterHoovesPosition > area.xStart
+          && taxiCopterHoovesPosition < area.xEnd && taxiCopter.speedY > 0
         ) {
           taxiCopter.landedOn = {x: taxiCopter.x, y: taxiCopter.y + 5 };
         };
