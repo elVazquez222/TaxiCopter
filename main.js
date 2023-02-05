@@ -139,8 +139,8 @@ window.addEventListener('load', () => {
       this.taxiCopter.update();
     }
     draw(context) {
-      this.taxiCopter.draw(context);
       this.destinations.forEach(destination => destination.draw(context));
+      this.taxiCopter.draw(context);
     }
   }
 
