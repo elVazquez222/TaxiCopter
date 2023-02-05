@@ -174,8 +174,8 @@ window.addEventListener('load', () => {
     landingAreas.forEach(area => {
 
       const visualHoovesOffset = taxiCopter.speedX > 0
-        ? taxiCopter.width * .2
-        : taxiCopter.width * .8;
+        ? taxiCopter.width * .15
+        : taxiCopter.width * .85;
         const taxiCopterHoovesPosition = taxiCopter.x + visualHoovesOffset;
 
       if(
