@@ -90,11 +90,11 @@ window.addEventListener('load', () => {
       this.width = taxiCopterWidth;
       this.height = taxiCopterHeight;
       this.x = 20;
-      this.y = canvas.height - this.height - 5;
+      this.y = canvas.height - this.height;
       this.speedY = 0;
       this.speedX = 0;
       this.starting = false;
-      this.landedOn = {x: this.x, y: this.y}; // :{x:number, y:number}|null
+      this.landedOn = {x: this.x, y: this.y * 2}; // :{x:number, y:number}|null
       this.copterEngineAnimationSpeed = 3;
     }
     update() {
@@ -110,7 +110,7 @@ window.addEventListener('load', () => {
       if (this.landedOn !== null && this.speedY !== 0) {
         this.speedY = 0;
         this.speedX = 0;
-        this.y = this.landedOn.y +-5;
+        this.y = this.landedOn.y - this.height;
         this.x = this.landedOn.x;
         return;
       }
@@ -179,12 +179,12 @@ window.addEventListener('load', () => {
         const taxiCopterHoovesPosition = taxiCopter.x + visualHoovesOffset;
 
       if(
-          taxiCopter.y + taxiCopterHeight - 5 >= area.yStart - taxiCopterHeight
-          && taxiCopter.y + taxiCopterHeight - 5 < area.yEnd - taxiCopterHeight
+          taxiCopter.y + taxiCopterHeight * 1.5 >= area.yStart - taxiCopterHeight
+          && taxiCopter.y + taxiCopterHeight < area.yEnd
           && taxiCopterHoovesPosition > area.xStart
           && taxiCopterHoovesPosition < area.xEnd && taxiCopter.speedY > 0
         ) {
-          taxiCopter.landedOn = {x: taxiCopter.x, y: taxiCopter.y + 5 };
+          taxiCopter.landedOn = {x: taxiCopter.x, y: taxiCopter.y + taxiCopterHeight};
         };
     });
   }
