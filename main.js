@@ -37,6 +37,9 @@ window.addEventListener('load', () => {
           game.taxiCopter.speedY -= 1;
         }
         if (event.key === "ArrowDown") {
+          if(game.taxiCopter.landedOn !== null || game.taxiCopter.speedY === 0) {
+            return;
+          }
           game.taxiCopter.speedY += 1;
         }
         if (event.key === "ArrowLeft") {
@@ -103,7 +106,6 @@ window.addEventListener('load', () => {
       this.speedY !== 0 && debounce(checkLanding(this));
 
       if (this.landedOn !== null && this.speedY !== 0) {
-        console.log(this.landedOn);
         this.speedY = 0;
         this.speedX = 0;
         this.y = this.landedOn.y;
@@ -157,7 +159,7 @@ window.addEventListener('load', () => {
     document.getElementById('x').innerHTML = `x: ${x}`
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('y').innerHTML = `y: ${y}`
-    document.getElementById('bottomReached').innerHTML = `gelandet: ${y + taxiHeight >= canvasHeight}`
+    document.getElementById('bottomReached').innerHTML = `gelandet: ${game.taxiCopter.landedOn !== null}`
   }
 
   const checkLanding = (taxiCopter) => {
