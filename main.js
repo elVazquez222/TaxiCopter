@@ -1,5 +1,5 @@
-import { debounce } from './helpers.js';
-import { destinations } from './destinations.js';
+import { debounce } from './scripts/helpers.js';
+import { destinations } from './assets/destinations.js';
 
 window.addEventListener('load', () => {
   const canvas = document.getElementById('canvas1');
@@ -10,6 +10,16 @@ window.addEventListener('load', () => {
   const taxiCopterHeight = 60;
   const gravity = -.00981;
   const landingAreas = [];
+
+  const heliRightEmpty_01 =  new Image();
+  heliRightEmpty_01.src = './media/heli_right_1.png';
+  const heliRightEmpty_02 =  new Image();
+  heliRightEmpty_02.src = './media/heli_right_2.png';
+  const heliLeftEmpty_01 =  new Image();
+  heliLeftEmpty_01.src = './media/heli_left_1.png';
+  const heliLeftEmpty_02 =  new Image();
+  heliLeftEmpty_02.src = './media/heli_left_2.png';
+  const heliPicIteration = [];
 
   class InputHandler {
     constructor(game) {
@@ -79,8 +89,15 @@ window.addEventListener('load', () => {
       this.speedX = 0;
       this.starting = false;
       this.landedOn = {x: this.x, y: this.y}; // :{x:number, y:number}|null
+      this.copterEngineAnimationSpeed = 3;
     }
     update() {
+      if(heliPicIteration.length === this.copterEngineAnimationSpeed) {
+        heliPicIteration.splice(0, heliPicIteration.length)
+      } else {
+        heliPicIteration.push('1');
+        console.log('change pic');
+      }
       consoleLog(this.speedY, this.speedX, this.x, this.y);
 
       this.speedY !== 0 && debounce(checkLanding(this));
@@ -99,8 +116,10 @@ window.addEventListener('load', () => {
       this.x += this.speedX
     }
     draw(context) {
-      ctx.fillStyle = "black";
-      context.fillRect(this.x, this.y, this.width, this.height);
+      const currentHeliPic = setHeliPic(this.speedX);
+      console.log(heliPicIteration.length);
+      ctx.drawImage(currentHeliPic, this.x, this.y, 200, 100);
+      // context.fillRect(this.x, this.y, this.width, this.height);
     }
   }
   class Game {
@@ -124,6 +143,13 @@ window.addEventListener('load', () => {
   }
 
   const game = new Game(canvas.width, canvas.height, destinations);
+
+  const setHeliPic = (speedX) => {
+    if(speedX < 0) {
+      return heliPicIteration.length === 0 ? heliLeftEmpty_02 : heliLeftEmpty_01;
+    }
+    return heliPicIteration.length === 0 ? heliRightEmpty_02 : heliRightEmpty_01;
+  }
 
   const consoleLog = (ySpeed, xSpeed, x, y, canvasHeight, taxiHeight) => {
     document.getElementById('ySpeed').innerHTML = `y speed: ${ySpeed}`
