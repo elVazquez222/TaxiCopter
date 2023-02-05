@@ -33,7 +33,6 @@ window.addEventListener('load', () => {
           } else {
             game.taxiCopter.starting = false;
           }
-
           game.taxiCopter.speedY -= 1;
         }
         if (event.key === "ArrowDown") {
@@ -43,14 +42,18 @@ window.addEventListener('load', () => {
           game.taxiCopter.speedY += 1;
         }
         if (event.key === "ArrowLeft") {
-          if (!game.taxiCopter.landed) {
-            game.taxiCopter.speedX -= 1;
+
+          if(game.taxiCopter.landedOn !== null || game.taxiCopter.speedY === 0) {
+            return;
           }
+          game.taxiCopter.speedX -= 1;
         }
         if (event.key === "ArrowRight") {
-          if (!game.taxiCopter.landed) {
-            game.taxiCopter.speedX += 1;
+
+          if(game.taxiCopter.landedOn !== null || game.taxiCopter.speedY === 0) {
+            return;
           }
+          game.taxiCopter.speedX += 1;
         }
       })
     }
@@ -99,7 +102,6 @@ window.addEventListener('load', () => {
         heliPicIteration.splice(0, heliPicIteration.length)
       } else {
         heliPicIteration.push('1');
-        console.log('change pic');
       }
       consoleLog(this.speedY, this.speedX, this.x, this.y);
 
@@ -108,7 +110,7 @@ window.addEventListener('load', () => {
       if (this.landedOn !== null && this.speedY !== 0) {
         this.speedY = 0;
         this.speedX = 0;
-        this.y = this.landedOn.y;
+        this.y = this.landedOn.y +-5;
         this.x = this.landedOn.x;
         return;
       }
@@ -117,11 +119,9 @@ window.addEventListener('load', () => {
       this.y += this.speedY;
       this.x += this.speedX
     }
-    draw(context) {
+    draw() {
       const currentHeliPic = setHeliPic(this.speedX);
-      console.log(heliPicIteration.length);
       ctx.drawImage(currentHeliPic, this.x, this.y, 200, 100);
-      // context.fillRect(this.x, this.y, this.width, this.height);
     }
   }
   class Game {
@@ -154,12 +154,14 @@ window.addEventListener('load', () => {
   }
 
   const consoleLog = (ySpeed, xSpeed, x, y, canvasHeight, taxiHeight) => {
+    const { landedOn } = game.taxiCopter;
     document.getElementById('ySpeed').innerHTML = `y speed: ${ySpeed}`
     document.getElementById('xSpeed').innerHTML = `x speed: ${xSpeed}`
     document.getElementById('x').innerHTML = `x: ${x}`
     document.getElementById('y').innerHTML = `y: ${y}`
     document.getElementById('y').innerHTML = `y: ${y}`
-    document.getElementById('bottomReached').innerHTML = `gelandet: ${game.taxiCopter.landedOn !== null}`
+    document.getElementById('landed').innerHTML = `gelandet: ${landedOn ? `x: ${landedOn.x} y: ${landedOn.y}` : 'nein'}`
+    document.getElementById('landedOn').innerHTML = `gelandet auf: ${game.taxiCopter.landedOn !== null}`
   }
 
   const checkLanding = (taxiCopter) => {
