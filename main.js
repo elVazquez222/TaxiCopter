@@ -115,6 +115,12 @@ window.addEventListener('load', () => {
         return;
       }
 
+      const reachingRightBorder = window.innerWidth - this.x < 500;
+      console.log(window.innerWidth - this.x);
+      const reachingLeftBorder = window.innerWidth - this.x > 100;
+      reachingRightBorder && scroll(this, -1)
+      // reachingLeftBorder && scroll(1);
+
       this.speedY -= !this.landedOn ? gravity : 0;
       this.y += this.speedY;
       this.x += this.speedX
@@ -191,6 +197,12 @@ window.addEventListener('load', () => {
           taxiCopter.landedOn = {x: taxiCopter.x, y: taxiCopter.y + taxiCopterHeight};
         };
     });
+  }
+
+  const scroll = (heli, direction) => {
+    const scrollSpeed = 2;
+    ctx.translate(direction * scrollSpeed, 0);
+    heli.speedX = direction * -scrollSpeed;
   }
 
   const animate = () => {
