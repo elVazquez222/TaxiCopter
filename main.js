@@ -4,12 +4,13 @@ import { destinations } from './assets/destinations.js';
 window.addEventListener('load', () => {
   const canvas = document.getElementById('canvas1');
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
+  canvas.width = destinations[destinations.length-1].x + destinations[destinations.length-1].width + 300;
   canvas.height = window.innerHeight - window.innerHeight * .1;
   const taxiCopterWidth = 120;
   const taxiCopterHeight = 60;
   const gravity = -.00981;
   const landingAreas = [];
+  const scrollSpeed = 2;
 
   const heliRightEmpty_01 =  new Image();
   heliRightEmpty_01.src = './media/heli_right_1.png';
@@ -96,6 +97,8 @@ window.addEventListener('load', () => {
       this.starting = false;
       this.landedOn = {x: this.x, y: this.y * 2}; // :{x:number, y:number}|null
       this.copterEngineAnimationSpeed = 3;
+      this.scrolling = false;
+      this.scrollPosition = 0;
     }
     update() {
       if(heliPicIteration.length === this.copterEngineAnimationSpeed) {
@@ -114,12 +117,16 @@ window.addEventListener('load', () => {
         this.x = this.landedOn.x;
         return;
       }
+      const reachingRightBorder = window.innerWidth - this.x < window.innerWidth * .3
+        && window.outerWidth > this.x
+        && this.speedX > 0;
+      console.log(reachingRightBorder);
+      const reachingLeftBorder = window.innerWidth - this.x > 100
+        && this.x > 200
+        && this.speedX < 0;
 
-      const reachingRightBorder = window.innerWidth - this.x < 500;
-      console.log(window.innerWidth - this.x);
-      const reachingLeftBorder = window.innerWidth - this.x > 100;
-      reachingRightBorder && scroll(this, -1)
-      // reachingLeftBorder && scroll(1);
+      reachingRightBorder && scroll(this, game, -1)
+      reachingLeftBorder && scroll(this, game, 1);
 
       this.speedY -= !this.landedOn ? gravity : 0;
       this.y += this.speedY;
@@ -143,6 +150,9 @@ window.addEventListener('load', () => {
     }
     update() {
       this.taxiCopter.update();
+      if(this.scrolling) {
+        canvas.style.transform = `translate(scrollPosition, 0)`
+      }
     }
     draw(context) {
       this.destinations.forEach(destination => destination.draw(context));
@@ -199,10 +209,14 @@ window.addEventListener('load', () => {
     });
   }
 
-  const scroll = (heli, direction) => {
-    const scrollSpeed = 2;
+  const scroll = (taxi, game, direction) => {
+    game.scrolling = true;
     ctx.translate(direction * scrollSpeed, 0);
-    heli.speedX = direction * -scrollSpeed;
+    console.log('canvas.width', canvas.width);
+    if(Math.abs(taxi.speedX) > scrollSpeed) {
+      taxi = direction * -scrollSpeed;
+      game.scrollPosition += scrollSpeed * direction;
+    }
   }
 
   const animate = () => {
