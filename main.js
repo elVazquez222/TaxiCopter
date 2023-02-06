@@ -39,14 +39,14 @@ window.addEventListener('load', () => {
           if(game.taxiCopter.landedOn !== null || game.taxiCopter.speedY === 0) {
             return;
           }
-          game.taxiCopter.speedY += 1;
+          game.taxiCopter.speedY += .5;
         }
         if (event.key === "ArrowLeft") {
 
           if(game.taxiCopter.landedOn !== null || game.taxiCopter.speedY === 0) {
             return;
           }
-          game.taxiCopter.speedX -= 1;
+          game.taxiCopter.speedX -= .5;
         }
         if (event.key === "ArrowRight") {
 
@@ -81,7 +81,7 @@ window.addEventListener('load', () => {
         xEnd: this.x + this.width,
         yStart: this.y,
         yEnd: this.y + this.height
-      })
+      });
     }
   }
   class taxiCopterCopter {
@@ -178,9 +178,13 @@ window.addEventListener('load', () => {
         : taxiCopter.width * .85;
         const taxiCopterHoovesPosition = taxiCopter.x + visualHoovesOffset;
 
+      const taxiCopterVisualYPosition = taxiCopter.y + taxiCopterHeight * 1.5;
+      const landingSurfaceTolerance = 2;
+
       if(
-          taxiCopter.y + taxiCopterHeight * 1.5 >= area.yStart - taxiCopterHeight
-          && taxiCopter.y + taxiCopterHeight < area.yEnd
+          taxiCopterVisualYPosition >= area.yStart - taxiCopterHeight - landingSurfaceTolerance
+          && taxiCopterVisualYPosition < area.yStart - taxiCopterHeight + landingSurfaceTolerance
+          && taxiCopterVisualYPosition < area.yEnd
           && taxiCopterHoovesPosition > area.xStart
           && taxiCopterHoovesPosition < area.xEnd && taxiCopter.speedY > 0
         ) {
